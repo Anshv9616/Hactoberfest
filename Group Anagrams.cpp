@@ -1,35 +1,38 @@
-struct RetrieveValue
-{   
-    template <typename T>
-    typename T::second_type operator()(T keyValuePair) const
-    {   
-        return keyValuePair.second;
-    }
-};
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
 
 class Solution {
 public:
     vector<vector<string>> groupAnagrams(vector<string>& strs) {
         unordered_map<string, vector<string>> groups;
-        
-        for(string& str : strs){
+
+        for (const string& str : strs) {
             vector<int> count(26, 0);
-            for(char c : str){
-                count[c-'a']++;
+            for (char c : str) {
+                count[c - 'a']++;
             }
-            
-            string scount = "";
-            for(int& e : count){
-                scount += (to_string(e)+"#");
+
+            // Create a unique key from the count array
+            string key;
+            for (int e : count) {
+                key += to_string(e) + '#';
             }
-            
-            groups[scount].push_back(str);
+
+            groups[key].push_back(str);
         }
-        
+
+        // Reserve space for performance
         vector<vector<string>> ans;
+        ans.reserve(groups.size());
         
-        transform(groups.begin(), groups.end(), back_inserter(ans), RetrieveValue());
-        
+        for (auto& entry : groups) {
+            ans.push_back(move(entry.second)); // Move to avoid copying
+        }
+
         return ans;
     }
 };
